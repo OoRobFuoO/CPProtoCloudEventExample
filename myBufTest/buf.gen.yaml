@@ -1,4 +1,4 @@
 ﻿version: v1
 plugins:
   - name: csharp
-    out: gen/proto/csharp
+    out: Schema/gen/proto/csharp
