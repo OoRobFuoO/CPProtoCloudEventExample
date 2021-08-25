@@ -9,10 +9,10 @@
 
 ## Step to prepare
 
-. Run `buf generate Schema/proto` to generate code-binding
-. Update the Kafka cluster connectivity with the correct setting in `KafkaClientConfig.cs`
-. Change the _topicName to the correct test topic name in `Program.cs`
-. Build and run the solution
+* Run `buf generate Schema/proto` to generate code-binding
+* Update the Kafka cluster connectivity with the correct setting in `KafkaClientConfig.cs`
+* Change the _topicName to the correct test topic name in `Program.cs`
+* Build and run the solution
 
 
 # Note
