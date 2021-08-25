@@ -1,0 +1,32 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Confluent.Kafka" />
+    <None Remove="Confluent.SchemaRegistry" />
+    <None Remove="Schema\" />
+    <None Remove="Schema\proto\" />
+    <None Remove="Schema\gen\" />
+    <None Remove="Google.Protobuf" />
+    <None Remove="Google.Protobuf.Tools" />
+    <None Remove="Schema\gen\proto\csharp\" />
+    <None Remove="Confluent.SchemaRegistry.Serdes.Protobuf" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="1.7.0" />
+    <PackageReference Include="Confluent.SchemaRegistry" Version="1.7.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.17.3" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.17.2" />
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes.Protobuf" Version="1.7.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Schema\" />
+    <Folder Include="Schema\proto\" />
+    <Folder Include="Schema\gen\" />
+    <Folder Include="Schema\gen\proto\csharp\" />
+  </ItemGroup>
+</Project>

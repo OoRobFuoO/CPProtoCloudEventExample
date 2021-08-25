@@ -1,0 +1,6 @@
+*.dll
+*.pdb
+.vs/*
+myBufTest/.vs/*
+myBufTest/bin/*
+myBufTest/obj/*

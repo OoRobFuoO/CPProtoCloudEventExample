@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+package RF.myBufTest.schema.data;
+
+import "google/protobuf/timestamp.proto";
+
+message User
+{
+    string userID = 100;
+    string firstname = 101;
+    string lastname = 102;
+}

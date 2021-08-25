@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+package RF.myBufTest.schema.data;
+
+import "google/protobuf/timestamp.proto";
+
+message Account
+{
+    string AccountID = 200;
+    google.protobuf.Timestamp CreateDate = 201;
+    repeated string AccountHolderID = 202;
+}
