@@ -37,16 +37,17 @@ namespace RF.myBufTest
             return u;
         }
 
-        /*
-        private static T read<T>(Google.Protobuf.WellKnownTypes.Any data) where T : IMessage 
+        private static Account createAccount(string id)
         {
-            if (data.Is(T.Descriptor))
-                return data.Unpack<T>();
-            else
+            Account a = new Account();
+            a.AccountID = id;
+            a.AccountHolderID.Add("1");
+            a.AccountHolderID.Add("2");
+            a.AccountHolderID.Add("3");
+            a.CreateDate = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(System.DateTime.Now.ToUniversalTime());
 
-            return null;
+            return a;
         }
-        */
 
         static async Task Main(string[] args)
         {
@@ -71,12 +72,18 @@ namespace RF.myBufTest
                                 if (consumeResult.Message.Value.Data.Is(User.Descriptor))
                                 {
                                     User u = consumeResult.Message.Value.Data.Unpack<User>();
-                                    
-                                    Console.WriteLine($"User ID: {u.UserID}, FirstName: {u.Firstname}, LastName: {u.Lastname}");
-                                    Console.WriteLine($"Type URL {consumeResult.Message.Value.Data.TypeUrl}");
+
+                                    Console.WriteLine($"User ID: {u.UserID}, FirstName: {u.Firstname}, LastName: {u.Lastname}");                                    
                                 }
                                 else
+                                {
+                                    // The 10th message (account message) should trigger this code block
                                     Console.WriteLine($"Data Type not match. Expected: {User.Descriptor}, Actual: {consumeResult.Message.Value.Data.TypeUrl}");
+
+                                    // TODO: Is it possible to perform dynamic casting using reflection?
+                                    Account a = consumeResult.Message.Value.Data.Unpack<Account>();
+                                    Console.WriteLine($"Account ID: {a.AccountID}, CreateDateTime: {a.CreateDate.ToDateTime().ToLocalTime()}, Holder count: {a.AccountHolderID.Count}");
+                                }
                             }
                             catch (ConsumeException e)
                             {
@@ -101,9 +108,19 @@ namespace RF.myBufTest
                 while(true)
                 {
                     i++;
-                    User u = createUser($"{i}", $"User {i} First Name", $"User {i} Last Name");
-                    CloudEventEnevlop msg = createMessage(u);
+                    CloudEventEnevlop msg;
 
+                    if (i==10)
+                    {
+                        // The 10th message will be an account message for demostration purposal
+                        Account a = createAccount("123");
+                        msg = createMessage(a);
+                    }
+                    else
+                    {
+                        User u = createUser($"{i}", $"User {i} First Name", $"User {i} Last Name");
+                        msg = createMessage(u);
+                    }
                     await producer
                        .ProduceAsync(_topicName, new Message<string, CloudEventEnevlop> { Key = i.ToString(), Value = msg })
                        .ContinueWith(task => task.IsFaulted
