@@ -9,23 +9,57 @@ using RF.MyBufTest.Schema;
 using RF.MyBufTest.Schema.Data;
 using Google.Protobuf;
 using Google.Protobuf.Reflection;
+using System.Collections.Generic;
 
 namespace RF.myBufTest
 {
-    class Program
+    class CEBuilder
     {
-        private static string _topicName = "testTopic";
-
-        private static CloudEventEnevlop createMessage(Google.Protobuf.IMessage data)
+        private static CloudEvent createProtoMessage(Google.Protobuf.IMessage data, bool Json)
         {
-            CloudEventEnevlop msg = new CloudEventEnevlop();
+            CloudEvent msg = new CloudEvent();
 
-            msg.Specversion = "1.0";
+            msg.SpecVersion = "1.0";
+            msg.Type = data.Descriptor.FullName;
+            msg.Id = new Guid().ToString();
+
+            if (Json)
+                msg.Datacontenttype = "JSON";
+            else
+                msg.Datacontenttype = "Protobuf";
+
+            msg.Time = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(DateTime.Now.ToUniversalTime());
 
             msg.Data = Google.Protobuf.WellKnownTypes.Any.Pack(data);
 
             return msg;
         }
+
+        public static CloudEvent createProtoMessage(Google.Protobuf.IMessage data)
+        {
+            return createProtoMessage(data, false);
+        }
+
+        public static string createJsonMessage(Google.Protobuf.IMessage data)
+        {
+            CloudEvent ce = createProtoMessage(data, true);
+
+            var registry = TypeRegistry.FromMessages(CloudEvent.Descriptor, data.Descriptor);
+
+            var f = new Google.Protobuf.JsonFormatter(new JsonFormatter.Settings(true, registry));
+
+            return f.Format(ce);
+        }
+
+    }
+
+    class Program
+    {
+        private static string _topicName_proto = "protoTest";
+        private static string _topicName_json = "jsonTest";
+        private static List<Task> _tasks = new List<Task>();
+        private static CancellationTokenSource _cts = new CancellationTokenSource();
+        private static int _producerWaitTime = 250;
 
         private static User createUser(string id, string firstName, string lastName)
         {
@@ -48,19 +82,28 @@ namespace RF.myBufTest
 
             return a;
         }
-
-        static async Task Main(string[] args)
+     
+        static void Main(string[] args)
         {
-            CancellationTokenSource cts = new CancellationTokenSource();
+            ProtoMode();
+            JsonMode();
+
+            Task.WaitAll(_tasks.ToArray());
+        }
+
+        static void ProtoMode()
+        {
+            string _mode = "Protobuf";
+
             var consumeTask = Task.Run(() =>
             {
                 using (var consumer =
-                    new ConsumerBuilder<string, CloudEventEnevlop>(KafkaClientConfig.cConfig)
-                        .SetValueDeserializer(new ProtobufDeserializer<CloudEventEnevlop>().AsSyncOverAsync())
+                    new ConsumerBuilder<string, CloudEvent>(KafkaClientConfig.cConfig)
+                        .SetValueDeserializer(new ProtobufDeserializer<CloudEvent>().AsSyncOverAsync())
                         .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}"))
                         .Build())
                 {
-                    consumer.Subscribe(_topicName);
+                    consumer.Subscribe(_topicName_proto);
 
                     try
                     {
@@ -68,26 +111,34 @@ namespace RF.myBufTest
                         {
                             try
                             {
-                                var consumeResult = consumer.Consume(cts.Token);
-                                if (consumeResult.Message.Value.Data.Is(User.Descriptor))
+                                var consumeResult = consumer.Consume(_cts.Token);
+                                if (consumeResult != null)
                                 {
-                                    User u = consumeResult.Message.Value.Data.Unpack<User>();
+                                    Console.WriteLine($"mode - [{_mode}] / Consumed message key: {consumeResult.Message.Key}, message value {consumeResult.Message.Value}");
+                                    if (consumeResult.Message.Value.Data.Is(User.Descriptor))
+                                    {
+                                        User u = consumeResult.Message.Value.Data.Unpack<User>();
 
-                                    Console.WriteLine($"User ID: {u.UserID}, FirstName: {u.Firstname}, LastName: {u.Lastname}");                                    
-                                }
-                                else
-                                {
-                                    // The 10th message (account message) should trigger this code block
-                                    Console.WriteLine($"Data Type not match. Expected: {User.Descriptor}, Actual: {consumeResult.Message.Value.Data.TypeUrl}");
+                                        Console.WriteLine($"mode - [{_mode}] / User ID: {u.UserID}, FirstName: {u.Firstname}, LastName: {u.Lastname}");
+                                    }
+                                    else
+                                    {
+                                        // The 10th message (account message) should trigger this code block
+                                        Console.WriteLine($"mode - [{_mode}] / Data Type not match. Expected: {User.Descriptor.FullName}, Actual: {consumeResult.Message.Value.Data.TypeUrl}");
 
-                                    // TODO: Is it possible to perform dynamic casting using reflection?
-                                    Account a = consumeResult.Message.Value.Data.Unpack<Account>();
-                                    Console.WriteLine($"Account ID: {a.AccountID}, CreateDateTime: {a.CreateDate.ToDateTime().ToLocalTime()}, Holder count: {a.AccountHolderID.Count}");
+                                        // TODO: Is it possible to perform dynamic casting using reflection?
+                                        Account a = consumeResult.Message.Value.Data.Unpack<Account>();
+                                        Console.WriteLine($"mode - [{_mode}] / Account ID: {a.AccountID}, CreateDateTime: {a.CreateDate.ToDateTime().ToLocalTime()}, Holder count: {a.AccountHolderID.Count}");
+                                    }
                                 }
                             }
                             catch (ConsumeException e)
                             {
-                                Console.WriteLine($"Consume error: {e.Error.Reason}");
+                                Console.WriteLine($"mode - [{_mode}] / Consume error: {e.Error.Reason}");
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine($"mode - [{_mode}] / Consume error: {e.Message}");
                             }
                         }
                     }
@@ -98,40 +149,127 @@ namespace RF.myBufTest
                 }
             });
 
-            using (var schemaRegistry = new CachedSchemaRegistryClient(KafkaClientConfig.srConfig))   
-            using (var producer =
-                    new ProducerBuilder<string, CloudEventEnevlop>(KafkaClientConfig.pConfig)
-                    .SetValueSerializer(new ProtobufSerializer<CloudEventEnevlop>(schemaRegistry))
-                    .Build())
+
+            var producerTask = Task.Run(() =>
             {
-                int i = 0;
-                while(true)
+                using (var schemaRegistry = new CachedSchemaRegistryClient(KafkaClientConfig.srConfig))
+                using (var producer =
+                        new ProducerBuilder<string, CloudEvent>(KafkaClientConfig.pConfig_Proto)
+                        .SetValueSerializer(new ProtobufSerializer<CloudEvent>(schemaRegistry))
+                        .Build())
                 {
-                    i++;
-                    CloudEventEnevlop msg;
-
-                    if (i==10)
+                    int i = 0;
+                    while (true)
                     {
-                        // The 10th message will be an account message for demostration purposal
-                        Account a = createAccount("123");
-                        msg = createMessage(a);
-                    }
-                    else
-                    {
-                        User u = createUser($"{i}", $"User {i} First Name", $"User {i} Last Name");
-                        msg = createMessage(u);
-                    }
-                    await producer
-                       .ProduceAsync(_topicName, new Message<string, CloudEventEnevlop> { Key = i.ToString(), Value = msg })
-                       .ContinueWith(task => task.IsFaulted
-                           ? $"error producing message: {task.Exception.Message}"
-                           : $"produced to: {task.Result.TopicPartitionOffset}");
+                        i++;
+                        CloudEvent msg;
 
-                    System.Threading.Thread.Sleep(5000);
+                        if (i == 10)
+                        {
+                            // The 10th message will be an account message for demostration purposal
+                            Account a = createAccount("123");
+                            msg = CEBuilder.createProtoMessage(a);
+                        }
+                        else
+                        {
+                            User u = createUser($"{i}", $"User {i} First Name", $"User {i} Last Name");
+                            msg = CEBuilder.createProtoMessage(u);
+                        }
+
+                        producer
+                           .ProduceAsync(_topicName_proto, new Message<string, CloudEvent> { Key = i.ToString(), Value = msg })
+                           .ContinueWith(task => task.IsFaulted
+                               ? $"mode - [{_mode}] / error producing message: {task.Exception.Message}"
+                               : $"mode - [{_mode}] / produced to: {task.Result.TopicPartitionOffset}");
+
+                        producer.Flush(TimeSpan.FromSeconds(10));
+                        Console.WriteLine($"mode - [{_mode}] / Produced {i}");
+                        System.Threading.Thread.Sleep(_producerWaitTime);
+                    }
                 }
-                
-            }
+            });
 
+            _tasks.Add(consumeTask);
+            _tasks.Add(producerTask);
+        }
+
+        static void JsonMode()
+        {
+            string _mode = "Json";
+
+            var consumeTask = Task.Run(() =>
+            {
+                using (var consumer =
+                    new ConsumerBuilder<string, string>(KafkaClientConfig.cConfig)
+                        .SetErrorHandler((_, e) => Console.WriteLine($"Error: {e.Reason}"))
+                        .Build())
+                {
+                    consumer.Subscribe(_topicName_json);
+
+                    try
+                    {
+                        while (true)
+                        {
+                            try
+                            {
+                                var consumeResult = consumer.Consume(_cts.Token);
+                                Console.WriteLine($"mode - [{_mode}] / Message: {consumeResult.Message.Value}");
+
+                               // User u = User.Parser.ParseJson(consumeResult.Message.Value);
+                            }
+                            catch (ConsumeException e)
+                            {
+                                Console.WriteLine($"mode - [{_mode}] / Consume error: {e.Error.Reason}");
+                            }
+                        }
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        consumer.Close();
+                    }
+                }
+            });
+
+            var producerTask = Task.Run(() =>
+            {
+                using (var producer =
+                    new ProducerBuilder<string, string>(KafkaClientConfig.pConfig_Json_SnappyCompressed).Build())
+                {
+                    int i = 1000;
+                    while (true)
+                    {
+                        i++;
+                        string msg;
+
+                        if (i == 1010)
+                        {
+                            // The 10th message will be an account message for demostration purposal
+                            Account a = createAccount("123");
+                            msg = CEBuilder.createJsonMessage(a);
+                        }
+                        else
+                        {
+                            User u = createUser($"{i}", $"User {i} First Name", $"User {i} Last Name");
+                            msg = CEBuilder.createJsonMessage(u);
+                        }
+
+                        producer
+                           .ProduceAsync(_topicName_json, new Message<string, string> { Key = i.ToString(), Value = msg })
+                           .ContinueWith(task => task.IsFaulted
+                               ? $"mode - [{_mode}] / error producing message: {task.Exception.Message}"
+                               : $"mode - [{_mode}] / produced to: {task.Result.TopicPartitionOffset}");
+
+                        producer.Flush(TimeSpan.FromSeconds(10));
+                        Console.WriteLine($"mode - [{_mode}] / Produced {i}");
+
+                        System.Threading.Thread.Sleep(_producerWaitTime);
+                    }
+
+                }
+            });
+
+            _tasks.Add(consumeTask);
+            _tasks.Add(producerTask);
         }
     }
 }

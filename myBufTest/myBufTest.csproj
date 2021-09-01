@@ -13,7 +13,6 @@
     <None Remove="Schema\gen\" />
     <None Remove="Google.Protobuf" />
     <None Remove="Google.Protobuf.Tools" />
-    <None Remove="Schema\gen\proto\csharp\" />
     <None Remove="Confluent.SchemaRegistry.Serdes.Protobuf" />
   </ItemGroup>
   <ItemGroup>
@@ -27,6 +26,5 @@
     <Folder Include="Schema\" />
     <Folder Include="Schema\proto\" />
     <Folder Include="Schema\gen\" />
-    <Folder Include="Schema\gen\proto\csharp\" />
   </ItemGroup>
 </Project>

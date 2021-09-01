@@ -25,9 +25,9 @@ namespace RF.MyBufTest.Schema.Data {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
             "CgpVc2VyLnByb3RvEhhSRi5teUJ1ZlRlc3Quc2NoZW1hLmRhdGEaH2dvb2ds",
-            "ZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8iWAoEVXNlchIWCgZ1c2VySUQY",
-            "ZCABKAlSBnVzZXJJRBIcCglmaXJzdG5hbWUYZSABKAlSCWZpcnN0bmFtZRIa",
-            "CghsYXN0bmFtZRhmIAEoCVIIbGFzdG5hbWViBnByb3RvMw=="));
+            "ZS9wcm90b2J1Zi90aW1lc3RhbXAucHJvdG8iWwoEVXNlchIXCgZ1c2VySUQY",
+            "kE4gASgJUgZ1c2VySUQSHQoJZmlyc3RuYW1lGJFOIAEoCVIJZmlyc3RuYW1l",
+            "EhsKCGxhc3RuYW1lGJJOIAEoCVIIbGFzdG5hbWViBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { global::Google.Protobuf.WellKnownTypes.TimestampReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
@@ -46,19 +46,23 @@ namespace RF.MyBufTest.Schema.Data {
     private static readonly pb::MessageParser<User> _parser = new pb::MessageParser<User>(() => new User());
     private pb::UnknownFieldSet _unknownFields;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pb::MessageParser<User> Parser { get { return _parser; } }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
       get { return global::RF.MyBufTest.Schema.Data.UserReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     pbr::MessageDescriptor pb::IMessage.Descriptor {
       get { return Descriptor; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public User() {
       OnConstruction();
     }
@@ -66,6 +70,7 @@ namespace RF.MyBufTest.Schema.Data {
     partial void OnConstruction();
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public User(User other) : this() {
       userID_ = other.userID_;
       firstname_ = other.firstname_;
@@ -74,14 +79,16 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public User Clone() {
       return new User(this);
     }
 
     /// <summary>Field number for the "userID" field.</summary>
-    public const int UserIDFieldNumber = 100;
+    public const int UserIDFieldNumber = 10000;
     private string userID_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string UserID {
       get { return userID_; }
       set {
@@ -90,9 +97,10 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     /// <summary>Field number for the "firstname" field.</summary>
-    public const int FirstnameFieldNumber = 101;
+    public const int FirstnameFieldNumber = 10001;
     private string firstname_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Firstname {
       get { return firstname_; }
       set {
@@ -101,9 +109,10 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     /// <summary>Field number for the "lastname" field.</summary>
-    public const int LastnameFieldNumber = 102;
+    public const int LastnameFieldNumber = 10002;
     private string lastname_ = "";
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public string Lastname {
       get { return lastname_; }
       set {
@@ -112,11 +121,13 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override bool Equals(object other) {
       return Equals(other as User);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public bool Equals(User other) {
       if (ReferenceEquals(other, null)) {
         return false;
@@ -131,6 +142,7 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
       if (UserID.Length != 0) hash ^= UserID.GetHashCode();
@@ -143,25 +155,27 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override string ToString() {
       return pb::JsonFormatter.ToDiagnosticString(this);
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void WriteTo(pb::CodedOutputStream output) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
       if (UserID.Length != 0) {
-        output.WriteRawTag(162, 6);
+        output.WriteRawTag(130, 241, 4);
         output.WriteString(UserID);
       }
       if (Firstname.Length != 0) {
-        output.WriteRawTag(170, 6);
+        output.WriteRawTag(138, 241, 4);
         output.WriteString(Firstname);
       }
       if (Lastname.Length != 0) {
-        output.WriteRawTag(178, 6);
+        output.WriteRawTag(146, 241, 4);
         output.WriteString(Lastname);
       }
       if (_unknownFields != null) {
@@ -172,17 +186,18 @@ namespace RF.MyBufTest.Schema.Data {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
       if (UserID.Length != 0) {
-        output.WriteRawTag(162, 6);
+        output.WriteRawTag(130, 241, 4);
         output.WriteString(UserID);
       }
       if (Firstname.Length != 0) {
-        output.WriteRawTag(170, 6);
+        output.WriteRawTag(138, 241, 4);
         output.WriteString(Firstname);
       }
       if (Lastname.Length != 0) {
-        output.WriteRawTag(178, 6);
+        output.WriteRawTag(146, 241, 4);
         output.WriteString(Lastname);
       }
       if (_unknownFields != null) {
@@ -192,16 +207,17 @@ namespace RF.MyBufTest.Schema.Data {
     #endif
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
       if (UserID.Length != 0) {
-        size += 2 + pb::CodedOutputStream.ComputeStringSize(UserID);
+        size += 3 + pb::CodedOutputStream.ComputeStringSize(UserID);
       }
       if (Firstname.Length != 0) {
-        size += 2 + pb::CodedOutputStream.ComputeStringSize(Firstname);
+        size += 3 + pb::CodedOutputStream.ComputeStringSize(Firstname);
       }
       if (Lastname.Length != 0) {
-        size += 2 + pb::CodedOutputStream.ComputeStringSize(Lastname);
+        size += 3 + pb::CodedOutputStream.ComputeStringSize(Lastname);
       }
       if (_unknownFields != null) {
         size += _unknownFields.CalculateSize();
@@ -210,6 +226,7 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(User other) {
       if (other == null) {
         return;
@@ -227,6 +244,7 @@ namespace RF.MyBufTest.Schema.Data {
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public void MergeFrom(pb::CodedInputStream input) {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       input.ReadRawMessage(this);
@@ -237,15 +255,15 @@ namespace RF.MyBufTest.Schema.Data {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
-          case 802: {
+          case 80002: {
             UserID = input.ReadString();
             break;
           }
-          case 810: {
+          case 80010: {
             Firstname = input.ReadString();
             break;
           }
-          case 818: {
+          case 80018: {
             Lastname = input.ReadString();
             break;
           }
@@ -256,6 +274,7 @@ namespace RF.MyBufTest.Schema.Data {
 
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
+    [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalMergeFrom(ref pb::ParseContext input) {
       uint tag;
       while ((tag = input.ReadTag()) != 0) {
@@ -263,15 +282,15 @@ namespace RF.MyBufTest.Schema.Data {
           default:
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
-          case 802: {
+          case 80002: {
             UserID = input.ReadString();
             break;
           }
-          case 810: {
+          case 80010: {
             Firstname = input.ReadString();
             break;
           }
-          case 818: {
+          case 80018: {
             Lastname = input.ReadString();
             break;
           }

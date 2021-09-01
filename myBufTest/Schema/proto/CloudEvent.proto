@@ -1,0 +1,19 @@
+﻿syntax = "proto3";
+
+package RF.myBufTest.schema;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/any.proto";
+
+message CloudEvent
+{
+    string id = 1;
+    string source = 2; // URI-reference
+    string spec_version = 3;
+    string type = 4;
+    string subject = 5;
+    google.protobuf.Timestamp time = 6;
+    string datacontenttype = 7;
+   
+    google.protobuf.Any data = 10; // Allow use of any custom schema or well-known type
+}

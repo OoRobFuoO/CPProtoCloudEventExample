@@ -6,7 +6,7 @@ import "google/protobuf/timestamp.proto";
 
 message User
 {
-    string userID = 100;
-    string firstname = 101;
-    string lastname = 102;
+    string userID = 10000;
+    string firstname = 10001;
+    string lastname = 10002;
 }
